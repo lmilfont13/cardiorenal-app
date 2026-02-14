@@ -15,6 +15,7 @@ import { Activity } from "lucide-react"
 import { toast } from "sonner"
 
 const kfreSchema = z.object({
+    patientName: z.string().min(2, "Nome deve ter pelo menos 2 caracteres").max(100, "Nome muito longo"),
     age: z.coerce.number().min(18, "Idade mínima: 18 anos").max(120, "Idade máxima: 120 anos"),
     gender: z.enum(["male", "female"]),
     egfr: z.coerce.number().min(1, "Valor muito baixo").max(200, "Valor muito alto"),
@@ -57,6 +58,7 @@ export default function KfreCalculator() {
         // Save to Supabase (non-blocking)
         try {
             await saveKfreAssessment({
+                patient_name: data.patientName,
                 patient_age: data.age,
                 patient_gender: data.gender,
                 egfr: data.egfr,
@@ -102,6 +104,24 @@ export default function KfreCalculator() {
                 </CardHeader>
                 <CardContent>
                     <form onSubmit={onSubmit} className="space-y-6">
+                        {/* Patient Info */}
+                        <div className="space-y-4">
+                            <h3 className="text-lg font-semibold">Identificação do Paciente</h3>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="patientName">Nome Completo do Paciente *</Label>
+                                <Input
+                                    id="patientName"
+                                    type="text"
+                                    placeholder="Ex: Maria Oliveira"
+                                    {...register("patientName")}
+                                />
+                                {errors.patientName && (
+                                    <p className="text-sm text-red-600">{errors.patientName.message}</p>
+                                )}
+                            </div>
+                        </div>
+
                         {/* Demographics */}
                         <div className="space-y-4">
                             <h3 className="text-lg font-semibold">Dados Demográficos</h3>

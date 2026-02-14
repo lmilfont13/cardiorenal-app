@@ -3,6 +3,10 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co'
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder'
 
+if (supabaseUrl.includes('placeholder')) {
+    console.warn('⚠️ Supabase URL no definida. Usando placeholder.')
+}
+
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 // Types para TypeScript
@@ -21,6 +25,7 @@ export type User = {
 export type PreventAssessment = {
     id: string
     user_id?: string
+    patient_name?: string
     patient_age: number
     patient_gender: string
     systolic_bp: number
@@ -37,6 +42,7 @@ export type PreventAssessment = {
 export type KfreAssessment = {
     id: string
     user_id?: string
+    patient_name?: string
     patient_age: number
     patient_gender: string
     egfr: number

@@ -15,6 +15,7 @@ import { Heart } from "lucide-react"
 import { toast } from "sonner"
 
 const preventSchema = z.object({
+    patientName: z.string().min(2, "Nome deve ter pelo menos 2 caracteres").max(100, "Nome muito longo"),
     age: z.coerce.number().min(18, "Idade mínima: 18 anos").max(120, "Idade máxima: 120 anos"),
     gender: z.enum(["male", "female"]),
     systolicBP: z.coerce.number().min(70, "Valor muito baixo").max(250, "Valor muito alto"),
@@ -54,6 +55,7 @@ export default function PreventCalculator() {
         // Save to Supabase (non-blocking)
         try {
             await savePreventAssessment({
+                patient_name: data.patientName,
                 patient_age: data.age,
                 patient_gender: data.gender,
                 systolic_bp: data.systolicBP,
@@ -101,6 +103,24 @@ export default function PreventCalculator() {
                 </CardHeader>
                 <CardContent>
                     <form onSubmit={onSubmit} className="space-y-6">
+                        {/* Patient Info */}
+                        <div className="space-y-4">
+                            <h3 className="text-lg font-semibold">Identificação do Paciente</h3>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="patientName">Nome Completo do Paciente *</Label>
+                                <Input
+                                    id="patientName"
+                                    type="text"
+                                    placeholder="Ex: João da Silva"
+                                    {...register("patientName")}
+                                />
+                                {errors.patientName && (
+                                    <p className="text-sm text-red-600">{errors.patientName.message}</p>
+                                )}
+                            </div>
+                        </div>
+
                         {/* Demographics */}
                         <div className="space-y-4">
                             <h3 className="text-lg font-semibold">Dados Demográficos</h3>
