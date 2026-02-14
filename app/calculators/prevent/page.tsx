@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { calculatePrevent, type PreventInput } from "@/lib/calculators/prevent"
+import { savePreventAssessment } from "@/lib/db"
 import { Heart } from "lucide-react"
 
 const preventSchema = z.object({
@@ -43,11 +44,31 @@ export default function PreventCalculator() {
         },
     })
 
-    const onSubmit = handleSubmit((data: PreventFormData) => {
+    const onSubmit = handleSubmit(async (data: PreventFormData) => {
         setIsCalculating(true)
 
         // Calculate risk
         const result = calculatePrevent(data as PreventInput)
+
+        // Save to Supabase (non-blocking)
+        try {
+            await savePreventAssessment({
+                patient_age: data.age,
+                patient_gender: data.gender,
+                systolic_bp: data.systolicBP,
+                total_cholesterol: data.totalCholesterol,
+                hdl_cholesterol: data.hdlCholesterol,
+                has_diabetes: data.diabetes,
+                is_smoker: data.smoking,
+                on_bp_medication: data.onBPMeds,
+                risk_score: result.riskScore,
+                risk_category: result.riskCategory,
+            })
+            console.log('✅ Avaliação PREVENT salva no Supabase!')
+        } catch (error) {
+            console.error('⚠️ Erro ao salvar no Supabase:', error)
+            // Continue mesmo se falhar - não bloquear o usuário
+        }
 
         // Store result in sessionStorage
         sessionStorage.setItem("preventResult", JSON.stringify({ input: data, result }))

@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { calculateKfre, type KfreInput } from "@/lib/calculators/kfre"
+import { saveKfreAssessment } from "@/lib/db"
 import { Activity } from "lucide-react"
 
 const kfreSchema = z.object({
@@ -36,11 +37,39 @@ export default function KfreCalculator() {
         },
     })
 
-    const onSubmit = handleSubmit((data: KfreFormData) => {
+    const onSubmit = handleSubmit(async (data: KfreFormData) => {
         setIsCalculating(true)
 
         // Calculate risk
         const result = calculateKfre(data as KfreInput)
+
+        // Calculate kidney stage based on eGFR
+        const getKidneyStage = (egfr: number): string => {
+            if (egfr >= 90) return "G1"
+            if (egfr >= 60) return "G2"
+            if (egfr >= 45) return "G3a"
+            if (egfr >= 30) return "G3b"
+            if (egfr >= 15) return "G4"
+            return "G5"
+        }
+
+        // Save to Supabase (non-blocking)
+        try {
+            await saveKfreAssessment({
+                patient_age: data.age,
+                patient_gender: data.gender,
+                egfr: data.egfr,
+                acr: data.acr,
+                risk_2_year: result.risk2Year,
+                risk_5_year: result.risk5Year,
+                kidney_stage: getKidneyStage(data.egfr),
+                risk_category: result.riskCategory,
+            })
+            console.log('✅ Avaliação KFRE salva no Supabase!')
+        } catch (error) {
+            console.error('⚠️ Erro ao salvar no Supabase:', error)
+            // Continue mesmo se falhar - não bloquear o usuário
+        }
 
         // Store result in sessionStorage
         sessionStorage.setItem("kfreResult", JSON.stringify({ input: data, result }))
