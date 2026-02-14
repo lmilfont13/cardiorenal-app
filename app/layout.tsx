@@ -10,6 +10,8 @@ export const metadata: Metadata = {
   description: "Avaliação de risco cardiovascular e renal para profissionais de saúde",
 };
 
+import { Toaster } from "sonner";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -18,6 +20,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body className={inter.className}>
+        <Toaster position="top-right" richColors />
         <Navigation />
         <main className="min-h-screen bg-gray-50">
           {children}

@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label"
 import { calculatePrevent, type PreventInput } from "@/lib/calculators/prevent"
 import { savePreventAssessment } from "@/lib/db"
 import { Heart } from "lucide-react"
+import { toast } from "sonner"
 
 const preventSchema = z.object({
     age: z.coerce.number().min(18, "Idade mínima: 18 anos").max(120, "Idade máxima: 120 anos"),
@@ -64,10 +65,10 @@ export default function PreventCalculator() {
                 risk_score: result.riskScore,
                 risk_category: result.riskCategory,
             })
-            console.log('✅ Avaliação PREVENT salva no Supabase!')
+            toast.success('Avaliação PREVENT salva no banco de dados!')
         } catch (error) {
             console.error('⚠️ Erro ao salvar no Supabase:', error)
-            // Continue mesmo se falhar - não bloquear o usuário
+            toast.error('Erro ao conectar ao banco de dados, mas o resultado local está disponível.')
         }
 
         // Store result in sessionStorage

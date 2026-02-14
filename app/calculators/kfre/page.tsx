@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label"
 import { calculateKfre, type KfreInput } from "@/lib/calculators/kfre"
 import { saveKfreAssessment } from "@/lib/db"
 import { Activity } from "lucide-react"
+import { toast } from "sonner"
 
 const kfreSchema = z.object({
     age: z.coerce.number().min(18, "Idade mínima: 18 anos").max(120, "Idade máxima: 120 anos"),
@@ -65,10 +66,10 @@ export default function KfreCalculator() {
                 kidney_stage: getKidneyStage(data.egfr),
                 risk_category: result.riskCategory,
             })
-            console.log('✅ Avaliação KFRE salva no Supabase!')
+            toast.success('Avaliação KFRE salva no banco de dados!')
         } catch (error) {
             console.error('⚠️ Erro ao salvar no Supabase:', error)
-            // Continue mesmo se falhar - não bloquear o usuário
+            toast.error('Erro ao conectar ao banco de dados, mas o resultado local está disponível.')
         }
 
         // Store result in sessionStorage
