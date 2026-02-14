@@ -1,0 +1,5 @@
+# Test and Debug scripts
+test_insert.js
+test_supabase.js
+verify_db.ts
+supabase_schema.sql
