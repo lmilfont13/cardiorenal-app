@@ -1,14 +1,33 @@
--- Adicionar coluna patient_name nas tabelas de avaliações
--- Execute este script no Supabase SQL Editor
+-- ============================================
+-- 🔧 ADICIONAR CAMPO patient_name
+-- ============================================
+-- Execute este SQL no Supabase SQL Editor
+-- Link: https://supabase.com/dashboard/project/_/sql/new
+-- ============================================
 
--- Adicionar coluna na tabela prevent_assessments
+-- 1. Adicionar coluna patient_name na tabela prevent_assessments
 ALTER TABLE prevent_assessments 
 ADD COLUMN IF NOT EXISTS patient_name TEXT;
 
--- Adicionar coluna na tabela kfre_assessments
+-- 2. Adicionar coluna patient_name na tabela kfre_assessments
 ALTER TABLE kfre_assessments 
 ADD COLUMN IF NOT EXISTS patient_name TEXT;
 
--- Comentários nas colunas
-COMMENT ON COLUMN prevent_assessments.patient_name IS 'Nome do paciente avaliado';
-COMMENT ON COLUMN kfre_assessments.patient_name IS 'Nome do paciente avaliado';
+-- 3. Verificar se as colunas foram adicionadas
+SELECT column_name, data_type 
+FROM information_schema.columns 
+WHERE table_name = 'prevent_assessments' 
+  AND column_name = 'patient_name';
+
+SELECT column_name, data_type 
+FROM information_schema.columns 
+WHERE table_name = 'kfre_assessments' 
+  AND column_name = 'patient_name';
+
+-- ============================================
+-- RESULTADO ESPERADO:
+-- ============================================
+-- Você deve ver duas linhas:
+-- column_name    | data_type
+-- patient_name   | text
+-- ============================================
